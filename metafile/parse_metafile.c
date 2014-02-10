@@ -5,18 +5,110 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "sha1.h"
+
 #define META_FILE_ANNOUNCE_TYPE                "8:announce"
 #define META_FILE_ANNOUNCE_LIST_TYPE           "13:announce-list"
 
 #define META_FILE_FILES_TYPE                   "5:files"
+
+int32 get_info_hash(const char8 *meta, meta_file_t *meta_file)
+{
+	if (!meta || !meta_file) 
+		return -1;
+
+	int32 push_pop = 0;
+	char8 *p = NULL;
+	char8 *b = NULL;
+	char8 *e = NULL;
+
+	int32 filesize = meta_file->meta_size;
+
+	if (p = strstr(meta, "4:info"))
+	{
+		p += strlen("4:info");
+		b = p;
+
+		while (*p != '\0')
+		{
+			if(*p == 'd') 
+			{ 
+				push_pop++;
+				p++;
+			} 
+			else if(*p == 'l') 
+			{
+				push_pop++;
+				p++;
+			} 
+			else if(*p == 'i') 
+			{
+				p++;  // skip i
+				if((p - meta) == filesize)  return -1;
+				while(*p != 'e') {
+					if((p - meta +1) == filesize)  return -1;
+					else p++;
+				}
+				p++;  // skip e
+			} 
+			else if((*p >= '0') && (*p <= '9')) 
+			{
+				int32 number = 0;
+				while((*p >= '0') && (*p <= '9')) 
+				{
+					number = number * 10 + (*p - '0');
+					p++;
+				}
+				p++;  // skip :
+				p = p + number;
+			} 
+			else if(*p == 'e') 
+			{
+				push_pop--;
+				if(push_pop == 0) { e = p; break; }
+				else  p++; 
+			} 
+			else 
+			{
+				return -1;
+			}
+		}
+
+		if((p - meta) == filesize)  return -1;
+
+		// sha1
+		SHA1Context sha;
+		SHA1Reset(&sha);
+		SHA1Input(&sha, (const uchar8 *)b, e - b + 1);
+		if (!SHA1Result(&sha))
+		{
+			printf("ERROR-- could not compute message digest");
+			return -1;
+		}
+		memcpy(meta_file->info_hash, sha.Message_Digest, 20);
+	}
+
+	return p ? 0 : -1;
+}
+
+int32 get_peer_id(const char8 *meta, meta_file_t *meta_file)
+{
+	if (!meta || !meta_file) 
+		return -1;
+
+	srand(time(NULL));
+	sprintf(meta_file->peer_id,"-TT1000-%12d",random());
+
+	return 0;
+}
 
 int32 get_file_length(const char8 *meta, meta_file_t *meta_file)
 {
 	if (!meta || !meta_file) 
 		return -1;
 
-	char8 *p    = (char8*)meta;
-	uint64  len = 0;
+	char8 *p   = meta;
+	uint64 len = 0;
 
 	if (p = strstr(p, "6:length"))
 	{
@@ -256,20 +348,21 @@ int32 parse_metafile(const char8 *filepath, meta_file_t *meta_file)
 	fseek(fp, 0, SEEK_SET);
 
 	// calloc
-	char8 *meta = (char8*)calloc(1, filesize + 1);
+	char8 *meta = (char8*)calloc(1, filesize);
 	if (!meta) return -1;
 
 	// read file
 	if (fread(meta, 1, filesize, fp) != filesize) return -1;
 
-	return parse_metafile2(meta, meta_file);
+	return parse_metafile2(meta, filesize, meta_file);
 }
 
-int32 parse_metafile2(const char8 *meta, meta_file_t *meta_file)
+int32 parse_metafile2(const char8 *meta, int32 meta_size, meta_file_t *meta_file)
 {
-	if (!meta) return -1;
+	if (!meta || !meta_file) return -1;
 
 	memset(meta_file, 0, sizeof(meta_file_t));
+	meta_file->meta_size = meta_size;
 
 	// announce
 	if (get_announce(meta, meta_file) != 0)
@@ -299,10 +392,26 @@ int32 parse_metafile2(const char8 *meta, meta_file_t *meta_file)
 		return -1;
 	}
 
+	// info hash
+	if (get_info_hash(meta, meta_file) != 0)
+	{
+		printf("get info hash failed!\n");
+		return -1;
+	}
+
+	// peer id
+	if (get_peer_id(meta, meta_file) != 0)
+	{
+		printf("get peer id failed!\n");
+		return -1;
+	}
+
 #if 1
 	printf("=============metafile info===============\n");
 	printf("[metafile] tracker num = %d\n", meta_file->tracker_num);
 	printf("[metafile] tracker url = %s\n", meta_file->tracker_url);
+	printf("[metafile] info hash = %s\n", meta_file->info_hash);
+	printf("[metafile] peer id = %s\n", meta_file->peer_id);
 	printf("[metafile] piece length = %d\n", meta_file->piece_length);
 	printf("[metafile] pieces = %s\n", meta_file->pieces);
 	printf("[metafile] is multi file = %d\n", meta_file->is_multi_file);

@@ -16,6 +16,8 @@ typedef struct _meta_file_file_t {
 
 typedef struct _meta_file_t {
 
+	int32                       meta_size;
+
 	int32						tracker_num;
 
 	char8               		*tracker_url;	
@@ -30,10 +32,14 @@ typedef struct _meta_file_t {
 
 	meta_file_file_t    		*file;
 
+	uchar8                      info_hash[21];
+
+	uchar8                      peer_id[21];
+
 } meta_file_t;
 
 int32 parse_metafile(const char8 *filepath, meta_file_t *meta_file);
 
-int32 parse_metafile2(const char8 *meta, meta_file_t *meta_file);
+int32 parse_metafile2(const char8 *meta, int32 meta_size, meta_file_t *meta_file);
 
 #endif

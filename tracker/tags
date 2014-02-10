@@ -1,0 +1,10 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+create_tracker_request	tracker.c	/^int32 create_tracker_request(meta_file_t *meta_file, char8 *request)$/;"	f	signature:(meta_file_t *meta_file, char8 *request)
+get_host_by_tracker	tracker.c	/^int32 get_host_by_tracker(char8 *tracker_url, char8 **host)$/;"	f	signature:(char8 *tracker_url, char8 **host)
+get_ip_by_host	tracker.c	/^int32 get_ip_by_host(char8 *host, char8 ip[16])$/;"	f	signature:(char8 *host, char8 ip[16])
+tracker_connect	tracker.c	/^int32 tracker_connect(meta_file_t *meta_file)$/;"	f	signature:(meta_file_t *meta_file)
