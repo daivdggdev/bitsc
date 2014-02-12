@@ -1,4 +1,4 @@
-#include "parse_metafile.h"
+#include "metafile.h"
 #include "tracker.h"
 
 int main(int argc, char **argv)

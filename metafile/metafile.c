@@ -309,27 +309,75 @@ int32 get_announce(const char8 *meta, meta_file_t *meta_file)
 	char8 *p  = NULL;
 	int32 len = 0;
 
-	if (p = strstr(meta, META_FILE_ANNOUNCE_TYPE))
+	meta_file_tracker_t *head = meta_file->tracker;
+	meta_file_tracker_t *node = NULL;
+	meta_file_tracker_t *n    = NULL;
+
+	if (p = strstr(meta, "13:announce-list"))
 	{
-		p += strlen(META_FILE_ANNOUNCE_TYPE);
+		p += strlen("13:announce-list");
+		p++;         // skip 'l'
 
-		while (isdigit(*p))
+		while(*p != 'e') 
 		{
-			len = len * 10 + (*p - '0');	
-			p++;
+			p++;     // skip 'l'
+			while( isdigit(*p) ) 
+			{
+				len = len * 10 + (*p - '0');
+				p++;
+			}
+
+			if( *p == ':' )  p++;
+			else return -1;
+
+			// support http only
+			if( memcmp(p, "http", 4) == 0 ) 
+			{
+				node = (meta_file_tracker_t*)calloc(1, sizeof(meta_file_tracker_t));
+				strncpy(node->url, p, len);
+				node->next = NULL;
+
+				if(head == NULL)
+				{
+					head = node;
+				}
+				else 
+				{
+					n = head;
+					while( n->next != NULL) n = n->next;
+					n->next = node;
+				}
+			}
+
+			p = p + len;
+			len = 0;
+			p++;    // skip 'e'
+
+			if((p - meta) >= meta_file->meta_size)  
+				return -1;
+		}	
+	}
+	else
+	{
+		if (p = strstr(meta, "8:announce"))
+		{
+			p += strlen("8:announce");
+
+			while( isdigit(*p) ) 
+			{
+				len = len * 10 + (*p - '0');
+				p++;
+			}
+
+			p++; //skip ':'
+
+			node = (meta_file_tracker_t*)calloc(1, sizeof(meta_file_tracker_t));
+			strncpy(node->url, p, len);
+			node->next = NULL;
+			meta_file->tracker = node;
 		}
-
-		// skip ':'
-		p++;
-
-		// get tracker url
-		meta_file->tracker_num = 1;
-		meta_file->tracker_url = (meta_file_t*)calloc(1, sizeof(meta_file_t));	
-		memcpy(meta_file->tracker_url, p, len);
 	}
 
-	//FIXME multiple trackers
-	
 	return p ? 0 : -1;
 }
 
@@ -408,8 +456,13 @@ int32 parse_metafile2(const char8 *meta, int32 meta_size, meta_file_t *meta_file
 
 #if 1
 	printf("=============metafile info===============\n");
-	printf("[metafile] tracker num = %d\n", meta_file->tracker_num);
-	printf("[metafile] tracker url = %s\n", meta_file->tracker_url);
+	meta_file_tracker_t *tracker = meta_file->tracker;
+	while (tracker)
+	{
+		printf("[metafile] tracker url = %s\n", tracker->url);
+		tracker = tracker->next;
+	}
+
 	printf("[metafile] info hash = %s\n", meta_file->info_hash);
 	printf("[metafile] peer id = %s\n", meta_file->peer_id);
 	printf("[metafile] piece length = %d\n", meta_file->piece_length);

@@ -106,7 +106,7 @@ int32 tracker_connect(meta_file_t *meta_file)
 
 	// get host
 	char8 *host = NULL;
-	if (get_host_by_tracker(meta_file->tracker_url, &host) != 0)
+	if (get_host_by_tracker(meta_file->tracker->url, &host) != 0)
 	{
 		printf("get_host_by_tracker failed!\n");
 		return -1;

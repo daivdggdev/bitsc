@@ -3,6 +3,14 @@
 
 #include "utils.h"
 
+typedef struct _meta_file_tracker_t {
+
+	char8 						url[128];
+
+	struct _meta_file_tracker_t *next;
+
+} meta_file_tracker_t;
+
 typedef struct _meta_file_file_t {
 
 	char8						file_name[1024];
@@ -18,9 +26,7 @@ typedef struct _meta_file_t {
 
 	int32                       meta_size;
 
-	int32						tracker_num;
-
-	char8               		*tracker_url;	
+	meta_file_tracker_t         *tracker;	
 
 	int32                       piece_length;
 
