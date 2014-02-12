@@ -1,5 +1,5 @@
-#ifndef __BITSC_PARSE_METAFILE_H__
-#define __BITSC_PARSE_METAFILE_H__
+#ifndef __BITSC_METAFILE_H__
+#define __BITSC_METAFILE_H__
 
 #include "utils.h"
 

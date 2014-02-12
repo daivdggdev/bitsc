@@ -1,4 +1,4 @@
-#include "parse_metafile.h"
+#include "metafile.h"
 
 #include <stdio.h>
 #include <stdlib.h>
