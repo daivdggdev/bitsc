@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <time.h>
 
 #include "sha1.h"
 
@@ -24,7 +25,7 @@ int32 get_info_hash(const char8 *meta, meta_file_t *meta_file)
 
 	int32 filesize = meta_file->meta_size;
 
-	if (p = strstr(meta, "4:info"))
+	if ((p = strstr(meta, "4:info")))
 	{
 		p += strlen("4:info");
 		b = p;
@@ -110,7 +111,7 @@ int32 get_file_length(const char8 *meta, meta_file_t *meta_file)
 	char8 *p   = meta;
 	uint64 len = 0;
 
-	if (p = strstr(p, "6:length"))
+	if ((p = strstr(p, "6:length")))
 	{
 		p += strlen("6:length");
 
@@ -139,7 +140,7 @@ int32 get_file_length_path(const char8 *meta, meta_file_t *meta_file)
 	meta_file_file_t *file = NULL;
 	meta_file_file_t *fp   = NULL;
 
-	while (p = strstr(p, "6:length"))
+	while ((p = strstr(p, "6:length")))
 	{
 		p += strlen("6:length");
 		len = 0;
@@ -215,7 +216,7 @@ int32 get_file(const char8 *meta, meta_file_t *meta_file)
 
 	get_file_mode(meta, meta_file);
 
-	if (p = strstr(meta, "4:name"))
+	if ((p = strstr(meta, "4:name")))
 	{
 		p += strlen("4:name");
 
@@ -254,7 +255,7 @@ int32 get_pieces(const char8 *meta, meta_file_t *meta_file)
 	char8 *p  = NULL;
 	int32 len = 0;
 
-	if (p = strstr(meta, "6:pieces"))
+	if ((p = strstr(meta, "6:pieces")))
 	{
 		p += strlen("6:pieces");
 
@@ -282,7 +283,7 @@ int32 get_piece_length(const char8 *meta, meta_file_t *meta_file)
 	char8 *p  = NULL;
 	int32 len = 0;
 
-	if (p = strstr(meta, "12:piece length"))
+	if ((p = strstr(meta, "12:piece length")))
 	{
 		p += strlen("12:piece length");
 
@@ -309,11 +310,10 @@ int32 get_announce(const char8 *meta, meta_file_t *meta_file)
 	char8 *p  = NULL;
 	int32 len = 0;
 
-	meta_file_tracker_t *head = meta_file->tracker;
-	meta_file_tracker_t *node = NULL;
-	meta_file_tracker_t *n    = NULL;
+	meta_file_announce_t *node = NULL;
+	meta_file_announce_t *n    = NULL;
 
-	if (p = strstr(meta, "13:announce-list"))
+	if ((p = strstr(meta, "13:announce-list")))
 	{
 		p += strlen("13:announce-list");
 		p++;         // skip 'l'
@@ -333,17 +333,17 @@ int32 get_announce(const char8 *meta, meta_file_t *meta_file)
 			// support http only
 			if( memcmp(p, "http", 4) == 0 ) 
 			{
-				node = (meta_file_tracker_t*)calloc(1, sizeof(meta_file_tracker_t));
+				node = (meta_file_announce_t*)calloc(1, sizeof(meta_file_announce_t));
 				strncpy(node->url, p, len);
 				node->next = NULL;
 
-				if(head == NULL)
+				if(meta_file->announce == NULL)
 				{
-					head = node;
+					meta_file->announce = node;
 				}
 				else 
 				{
-					n = head;
+					n = meta_file->announce;
 					while( n->next != NULL) n = n->next;
 					n->next = node;
 				}
@@ -359,7 +359,7 @@ int32 get_announce(const char8 *meta, meta_file_t *meta_file)
 	}
 	else
 	{
-		if (p = strstr(meta, "8:announce"))
+		if ((p = strstr(meta, "8:announce")))
 		{
 			p += strlen("8:announce");
 
@@ -371,10 +371,10 @@ int32 get_announce(const char8 *meta, meta_file_t *meta_file)
 
 			p++; //skip ':'
 
-			node = (meta_file_tracker_t*)calloc(1, sizeof(meta_file_tracker_t));
+			node = (meta_file_announce_t*)calloc(1, sizeof(meta_file_announce_t));
 			strncpy(node->url, p, len);
 			node->next = NULL;
-			meta_file->tracker = node;
+			meta_file->announce = node;
 		}
 	}
 
@@ -456,14 +456,19 @@ int32 parse_metafile2(const char8 *meta, int32 meta_size, meta_file_t *meta_file
 
 #if 1
 	printf("=============metafile info===============\n");
-	meta_file_tracker_t *tracker = meta_file->tracker;
-	while (tracker)
+	meta_file_announce_t *announce = meta_file->announce;
+	while (announce)
 	{
-		printf("[metafile] tracker url = %s\n", tracker->url);
-		tracker = tracker->next;
+		printf("[metafile] announce url = %s\n", announce->url);
+		announce = announce->next;
 	}
 
-	printf("[metafile] info hash = %s\n", meta_file->info_hash);
+	printf("[metafile] info hash = ");
+	int32 i;
+	for(i = 0; i < 20; i++)  
+		printf("%.2x ", meta_file->info_hash[i]);
+	printf("\n");
+
 	printf("[metafile] peer id = %s\n", meta_file->peer_id);
 	printf("[metafile] piece length = %d\n", meta_file->piece_length);
 	printf("[metafile] pieces = %s\n", meta_file->pieces);
