@@ -6,7 +6,7 @@
 #include <ctype.h>
 #include <time.h>
 
-#include "sha1.h"
+#include "polarssl/sha1.h"
 
 #define META_FILE_ANNOUNCE_TYPE                "8:announce"
 #define META_FILE_ANNOUNCE_LIST_TYPE           "13:announce-list"
@@ -78,15 +78,10 @@ int32 get_info_hash(const char8 *meta, meta_file_t *meta_file)
 		if((p - meta) == filesize)  return -1;
 
 		// sha1
-		SHA1Context sha;
-		SHA1Reset(&sha);
-		SHA1Input(&sha, (const uchar8 *)b, e - b + 1);
-		if (!SHA1Result(&sha))
-		{
-			printf("ERROR-- could not compute message digest");
-			return -1;
-		}
-		memcpy(meta_file->info_hash, sha.Message_Digest, 20);
+		sha1_context ctx;  
+		sha1_starts(&ctx);  
+		sha1_update(&ctx, b, e - b + 1);  
+		sha1_finish(&ctx, meta_file->info_hash);  
 	}
 
 	return p ? 0 : -1;

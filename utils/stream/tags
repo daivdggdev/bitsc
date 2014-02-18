@@ -1,0 +1,39 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+_BSTREAM_H_	bstream.h	2;"	d
+_GSTREAM_H_	gstream.h	2;"	d
+__tb_bstream_t	bstream.h	/^typedef struct __tb_bstream_t {$/;"	s
+__tb_bstream_t::b	bstream.h	/^	tb_size_t        b;$/;"	m	struct:__tb_bstream_t	access:public
+__tb_bstream_t::e	bstream.h	/^	tb_byte_t*       e;$/;"	m	struct:__tb_bstream_t	access:public
+__tb_bstream_t::n	bstream.h	/^	tb_size_t        n;$/;"	m	struct:__tb_bstream_t	access:public
+__tb_bstream_t::p	bstream.h	/^	tb_byte_t*       p;$/;"	m	struct:__tb_bstream_t	access:public
+b	bstream.h	/^	tb_size_t        b;$/;"	m	struct:__tb_bstream_t	access:public
+data	gstream.h	/^	tb_byte_t*                  data;$/;"	m	struct:gstream	access:public
+e	bstream.h	/^	tb_byte_t*       e;$/;"	m	struct:__tb_bstream_t	access:public
+gstream	gstream.h	/^typedef struct gstream {$/;"	s
+gstream::data	gstream.h	/^	tb_byte_t*                  data;$/;"	m	struct:gstream	access:public
+gstream::offset	gstream.h	/^	tb_size_t                   offset;$/;"	m	struct:gstream	access:public
+gstream::size	gstream.h	/^	tb_size_t                   size;$/;"	m	struct:gstream	access:public
+n	bstream.h	/^	tb_size_t        n;$/;"	m	struct:__tb_bstream_t	access:public
+offset	gstream.h	/^	tb_size_t                   offset;$/;"	m	struct:gstream	access:public
+p	bstream.h	/^	tb_byte_t*       p;$/;"	m	struct:__tb_bstream_t	access:public
+size	gstream.h	/^	tb_size_t                   size;$/;"	m	struct:gstream	access:public
+tb_bstream_attach	bstream.c	/^tb_bstream_t* tb_bstream_attach(tb_bstream_t *bst, $/;"	f	signature:(tb_bstream_t *bst, tb_byte_t *data, tb_size_t size)
+tb_bstream_get_u1	bstream.c	/^tb_size_t tb_bstream_get_u1(tb_bstream_t *bst)$/;"	f	signature:(tb_bstream_t *bst)
+tb_bstream_get_u16_be	bstream.c	/^tb_size_t tb_bstream_get_u16_be(tb_bstream_t *bst)$/;"	f	signature:(tb_bstream_t *bst)
+tb_bstream_get_u16_le	bstream.c	/^tb_size_t tb_bstream_get_u16_le(tb_bstream_t *bst)$/;"	f	signature:(tb_bstream_t *bst)
+tb_bstream_get_u24_be	bstream.c	/^tb_size_t tb_bstream_get_u24_be(tb_bstream_t *bst)$/;"	f	signature:(tb_bstream_t *bst)
+tb_bstream_get_u24_le	bstream.c	/^tb_size_t tb_bstream_get_u24_le(tb_bstream_t *bst)$/;"	f	signature:(tb_bstream_t *bst)
+tb_bstream_get_u32_be	bstream.c	/^tb_size_t tb_bstream_get_u32_be(tb_bstream_t *bst)$/;"	f	signature:(tb_bstream_t *bst)
+tb_bstream_get_u32_le	bstream.c	/^tb_size_t tb_bstream_get_u32_le(tb_bstream_t *bst)$/;"	f	signature:(tb_bstream_t *bst)
+tb_bstream_get_u8	bstream.c	/^tb_size_t tb_bstream_get_u8(tb_bstream_t *bst)$/;"	f	signature:(tb_bstream_t *bst)
+tb_bstream_skip	bstream.c	/^tb_void_t tb_bstream_skip(tb_bstream_t *bst, tb_size_t size)$/;"	f	signature:(tb_bstream_t *bst, tb_size_t size)
+tb_bstream_sync	bstream.c	/^tb_void_t tb_bstream_sync(tb_bstream_t *bst)$/;"	f	signature:(tb_bstream_t *bst)
+tb_bstream_t	bstream.h	/^}tb_bstream_t;$/;"	t	typeref:struct:__tb_bstream_t
+tb_gstream_left	gstream.c	/^tb_size_t tb_gstream_left(tb_gstream_t *gst)$/;"	f	signature:(tb_gstream_t *gst)
+tb_gstream_read	gstream.c	/^tb_ssize_t tb_gstream_read(tb_gstream_t *gst, tb_byte_t *data, tb_size_t size)$/;"	f	signature:(tb_gstream_t *gst, tb_byte_t *data, tb_size_t size)
+tb_gstream_t	gstream.h	/^}tb_gstream_t;$/;"	t	typeref:struct:gstream

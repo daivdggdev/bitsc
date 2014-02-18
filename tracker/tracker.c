@@ -11,6 +11,7 @@
 #include <ctype.h>
 
 #include "tracker.h"
+#include "bits.h"
 
 #define TRACKER_CONNECT_PORT               6881
 
@@ -151,6 +152,10 @@ int32 create_tracker_request(
 
 int32 socket_connect(int32 sock, struct sockaddr *remote)
 {
+	// set socket no block
+	int32 flag = fcntl(sock, F_GETFL, 0);
+	fcntl(sock, F_SETFL, flag | O_NONBLOCK);
+
 	int32 ret = connect(sock, remote, sizeof(struct sockaddr));
 	if (ret != 0)
 	{
@@ -206,6 +211,8 @@ int32 socket_connect(int32 sock, struct sockaddr *remote)
 			perror("socket connect failed!");
 		}
 	}
+
+	fcntl(sock, F_SETFL, flag);
 
 	return (ret == 0) ? 0 : -1;
 }
@@ -267,12 +274,6 @@ int32 tracker_connect(tracker_t *tracker, meta_file_t *meta_file)
 		int32 sock = socket(AF_INET, SOCK_STREAM, 0);
 		if (sock == -1) continue;
 
-#if 1
-		// set socket no block
-		int32 flag = fcntl(sock, F_GETFL, 0);
-		fcntl(sock, F_SETFL, flag | O_NONBLOCK);
-#endif
-
 		// get host
 		char8 *host = NULL;
 		int32 port = 0;
@@ -328,10 +329,6 @@ int32 tracker_connect(tracker_t *tracker, meta_file_t *meta_file)
 			announce = announce->next;
 			continue;
 		}
-
-#if 1
-		fcntl(sock, F_SETFL, flag);
-#endif
 
 		// send
 		int32 sent = 0;
